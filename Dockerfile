@@ -1,7 +1,7 @@
 #####################
 ### Server Build Step
 #####################
-FROM --platform=${TARGETPLATFORM:-linux/amd64} golang:1.19-bullseye AS server-builder 
+FROM --platform=${TARGETPLATFORM:-linux/amd64} golang:1.22-bullseye AS server-builder 
 
 
 RUN mkdir /server
@@ -23,7 +23,7 @@ FROM --platform=${TARGETPLATFORM:-linux/amd64} node:18-bullseye AS ui-builder
 WORKDIR /ui
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm ci --maxsockets 1
 
 COPY . .
 RUN make build-ssr

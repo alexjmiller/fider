@@ -1,6 +1,6 @@
 ## This is a self-documented Makefile. For usage information, run `make help`:
 ##
-## For more information, refer to https://suva.sh/posts/well-documented-makefiles/
+## For more information, refer to https://www.thapaliya.com/en/writings/well-documented-makefiles/
 
 LDFLAGS += -X github.com/getfider/fider/app/pkg/env.commithash=${COMMITHASH}
 
@@ -78,7 +78,7 @@ watch-ui: ## Build and run server in watch mode
 lint: lint-server lint-ui ## Lint server and ui
 
 lint-server: ## Lint server code
-	golangci-lint run --timeout 2m
+	golangci-lint run --timeout 3m
 
 lint-ui: ## Lint ui code
 	npx eslint .

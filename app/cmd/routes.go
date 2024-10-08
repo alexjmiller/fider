@@ -55,13 +55,6 @@ func routes(r *web.Engine) *web.Engine {
 	r.Use(middlewares.User())
 
 	r.Get("/privacy", handlers.LegalPage("Privacy Policy", "privacy.md"))
-	r.Get("/terms", handlers.LegalPage("Terms of Service", "terms.md"))
-
-	r.Post("/_api/tenants", handlers.CreateTenant())
-	r.Get("/_api/tenants/:subdomain/availability", handlers.CheckAvailability())
-	r.Get("/signup", handlers.SignUp())
-	r.Get("/oauth/:provider", handlers.SignInByOAuth())
-	r.Get("/oauth/:provider/callback", handlers.OAuthCallback())
 
 	if env.IsBillingEnabled() {
 		wh := r.Group()
@@ -69,6 +62,16 @@ func routes(r *web.Engine) *web.Engine {
 			wh.Post("/webhooks/paddle", webhooks.IncomingPaddleWebhook())
 		}
 	}
+
+	r.Use(middlewares.CSRF())
+
+	r.Get("/terms", handlers.LegalPage("Terms of Service", "terms.md"))
+
+	r.Post("/_api/tenants", handlers.CreateTenant())
+	r.Get("/_api/tenants/:subdomain/availability", handlers.CheckAvailability())
+	r.Get("/signup", handlers.SignUp())
+	r.Get("/oauth/:provider", handlers.SignInByOAuth())
+	r.Get("/oauth/:provider/callback", handlers.OAuthCallback())
 
 	//Starting from this step, a Tenant is required
 	r.Use(middlewares.RequireTenant())
@@ -79,7 +82,7 @@ func routes(r *web.Engine) *web.Engine {
 	{
 		tenantAssets.Use(middlewares.ClientCache(5 * 24 * time.Hour))
 		tenantAssets.Get("/static/avatars/letter/:id/:name", handlers.LetterAvatar())
-		tenantAssets.Get("/static/avatars/gravatar/:id/:name", handlers.Gravatar())
+		tenantAssets.Get("/static/avatars/gravatar/:id/*name", handlers.Gravatar())
 
 		tenantAssets.Use(middlewares.ClientCache(30 * 24 * time.Hour))
 		tenantAssets.Get("/static/favicon/*bkey", handlers.Favicon())

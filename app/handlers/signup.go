@@ -121,6 +121,11 @@ func CreateTenant() web.HandlerFunc {
 			c.Enqueue(tasks.SendWelcomeEmail(user.Name, user.Email, siteURL))
 		}
 
+		// Handle userlist.
+		if env.Config.UserList.Enabled {
+			c.Enqueue(tasks.UserListCreateCompany(*createTenant.Result, *user))
+		}
+
 		return c.Ok(web.Map{})
 	}
 }

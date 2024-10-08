@@ -15,9 +15,13 @@ import (
 // SearchPosts return existing posts based on search criteria
 func SearchPosts() web.HandlerFunc {
 	return func(c *web.Context) error {
+		viewQueryParams := c.QueryParam("view")
+		if viewQueryParams == "" {
+			viewQueryParams = "all" // Set default value to "all" if not provided
+		}
 		searchPosts := &query.SearchPosts{
 			Query: c.QueryParam("query"),
-			View:  c.QueryParam("view"),
+			View:  viewQueryParams,
 			Limit: c.QueryParam("limit"),
 			Tags:  c.QueryParamAsArray("tags"),
 		}
@@ -169,10 +173,7 @@ func DeletePost() web.HandlerFunc {
 			return c.Failure(err)
 		}
 
-		if action.Text != "" {
-			// Only send notification if user wrote a comment.
-			c.Enqueue(tasks.NotifyAboutDeletedPost(action.Post))
-		}
+		c.Enqueue(tasks.NotifyAboutDeletedPost(action.Post, action.Text != ""))
 
 		return c.Ok(web.Map{})
 	}
